@@ -97,8 +97,37 @@ def train_one_epoch(
             x_t = path_sample.x_t
             u_t = path_sample.dx_t
 
-            with torch.cuda.amp.autocast():
-                loss = torch.pow(model(x_t, t, extra=conditioning) - u_t, 2).mean()
+            with torch.amp.autocast("cuda"):
+                # Decide between regular CFM loss and idempotent loss
+                m = torch.rand(1).item()
+
+                if m <= 0.5:
+                    # Idempotent Flow Map training branch
+                    k = torch.randint(1, args.idempotent_max_k + 1, (1,)).item()
+                    with torch.no_grad():
+                        # Initial prediction
+                        x_hat = model(x_t, t, extra=conditioning)
+
+                    # Apply model repeatedly k times
+                    x1_list = []
+                    for i in range(k):
+                        # Instead of predicting velocity, we need the model to predict the next point directly
+                        # This might require a small adaptation in how the model is used
+                        x_hat = x_t + x_hat  # Convert velocity to position update
+                        x_hat = model(x_hat.detach(), t, extra=conditioning)
+                        x1_list.append(x_hat)
+
+                    # Calculate idempotent loss - average distance to target
+                    loss = 0
+                    for x_pred in x1_list:
+                        loss += torch.pow(
+                            x_pred - samples, 2
+                        ).mean()  # TODO: Check this
+                    loss = loss / len(x1_list)
+
+                else:
+                    # Regular Conditional Flow Matching loss
+                    loss = torch.pow(model(x_t, t, extra=conditioning) - u_t, 2).mean()
 
         loss_value = loss.item()
         batch_loss.update(loss)

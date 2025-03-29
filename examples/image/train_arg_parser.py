@@ -202,5 +202,17 @@ def get_args_parser():
         type=int,
         help="Number of sampling steps for discrete FM.",
     )
+    parser.add_argument(
+        "--idempotent_max_k",
+        default=10,
+        type=int,
+        help="Maximum number of iterations for idempotent flow map training",
+    )
+
+    parser.add_argument(
+        "--idempotent_training",
+        action="store_true",
+        help="Enable idempotent flow map training",
+    )
 
     return parser

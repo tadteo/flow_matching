@@ -84,6 +84,26 @@ MODEL_CONFIGS = {
         "use_new_attention_order": True,
         "with_fourier_features": False,
     },
+    "mnist": {
+        "model_channels": 64,
+        "channel_mult": (1, 2, 2),
+        "num_res_blocks": 2,
+        "attention_resolutions": (8,),
+        "dropout": 0.1,
+        "in_channels": 1,
+        "out_channels": 1,
+        "image_size": 28,
+    },
+    "mnist_discrete": {
+        "model_channels": 64,
+        "channel_mult": (1, 2, 2),
+        "num_res_blocks": 2,
+        "attention_resolutions": (8,),
+        "dropout": 0.1,
+        "in_channels": 1,
+        "out_channels": 1,
+        "image_size": 28,
+    },
 }
 
 

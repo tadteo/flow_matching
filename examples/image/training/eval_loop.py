@@ -116,6 +116,12 @@ def eval_model(
     for data_iter_step, (samples, labels) in enumerate(data_loader):
         samples = samples.to(device, non_blocking=True)
         labels = labels.to(device, non_blocking=True)
+
+        # Convert grayscale to RGB if using MNIST or other grayscale datasets
+        if args.dataset == "mnist" and samples.shape[1] == 1:
+            # Repeat the grayscale channel 3 times to create RGB
+            samples = samples.repeat(1, 3, 1, 1)
+
         fid_metric.update(samples, real=True)
 
         if num_synthetic < fid_samples:

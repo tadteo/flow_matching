@@ -67,6 +67,13 @@ def main(args):
             download=True,
             transform=transform_train,
         )
+    elif args.dataset == "mnist":
+        dataset_train = datasets.MNIST(
+            root=args.data_path,
+            train=True,
+            download=True,
+            transform=transform_train,
+        )
     else:
         raise NotImplementedError(f"Unsupported dataset {args.dataset}")
 
